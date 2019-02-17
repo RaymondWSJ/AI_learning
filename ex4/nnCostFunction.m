@@ -62,23 +62,45 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+%part 1
+%create y_matric
+y_matric = zeros(m,num_labels);
+for c=1:m
+y_matric(c,y(c)) = 1;
+end
 
+%add x0 into X
+X_1 = [ones(m,1),X];
+%hidden layer 2 equal X*Theta1
+%A2 = X * Theta1';
+Z2 = X_1 * Theta1';
+A2 = 1.0 ./ (1.0 + exp(-(X_1 * Theta1')));
+%add a20 into A2;
+A2_1 = [ones(size(X, 1),1),A2];
+%output layer  equal A2*Theta2
+%A3 = A2 * Theta2';
+Z3 = A2_1 * Theta2';
+A3 = 1.0 ./ (1.0 + exp(-(A2_1 * Theta2')));
 
+J= 1/m * sum(sum ( - y_matric .* log(A3) -( 1 - y_matric) .* log(1 - A3))) + lambda / (2 * m) * (sum(sum(Theta1(:,2:size(Theta1,2)).^2)) + sum(sum(Theta2(:,2:size(Theta2,2)).^2))) ;
 
+%part 2
+%use A3 - y can easily get delta3 which is the last delta
+delta3 = A3 - y_matric;
+%before calculte the 
+%delta2 = delta3 * Theta2_1 .* sigmoidGradient(A2);
+Theta2_1 = Theta2(:,2:size(Theta2,2));
+delta2 = delta3 * Theta2_1 .* sigmoidGradient(Z2);
+%delta2 = delta3 * Theta2_1 .* A2 .* (1 - A2);
 
+D2 = delta3' * A2_1;
 
+D1 = delta2' * X_1;
 
+%best regularization so far
+Theta2_grad = 1/m * (D2 + lambda *([zeros(size(Theta2,1),1),Theta2(:,2:size(Theta2,2))]));
 
-
-
-
-
-
-
-
-
-
-
+Theta1_grad = 1/m * (D1 + lambda *([zeros(size(Theta1,1),1),Theta1(:,2:size(Theta1,2))]));
 
 % -------------------------------------------------------------
 
